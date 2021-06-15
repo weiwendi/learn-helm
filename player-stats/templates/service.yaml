@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "player-stats.fullname" . }}
+  labels:
+    {{- include "player-stats.labels" . | nindent 4 }}
+spec:
+## 设置 serviceTypes 变量，值是一个列表类型
+{{- $serviceTypes := list "ClusterIP" "NodePort" }}
+## 判断 server 的类型是否为 NodePort | ClusterIP
+{{- if has .Values.service.type $serviceTypes }}
+  type: {{ .Values.service.type }}
+{{- else }}
+  {{- fail "value 'service.type' must be either 'ClusterIP' or 'NodePort'" }}
+{{- end }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "player-stats.selectorLabels" . | nindent 4 }}
