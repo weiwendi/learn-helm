@@ -1,6 +1,8 @@
 apiVersion: v2
 name: nginx
 description: A Helm chart for Kubernetes
+maintainers:
+  - name: "weiwendi"
 
 # A chart can be either an 'application' or a 'library' chart.
 #
