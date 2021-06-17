@@ -1,0 +1,2 @@
+service；
+  type: ClusterIP
