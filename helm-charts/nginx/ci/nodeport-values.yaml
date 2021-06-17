@@ -1,2 +1,2 @@
-service；
+service:
   type: NodePort
