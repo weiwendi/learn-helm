@@ -1,8 +1,6 @@
 apiVersion: v2
 name: player-stats
 description: A Helm chart for Kubernetes
-maintainers:
-  - name: "魏文弟"
 
 # A chart can be either an 'application' or a 'library' chart.
 #
