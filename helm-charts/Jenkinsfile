@@ -45,10 +45,8 @@ spec:
             }
         }
             steps {
-                script {
-                    sh "helm package --dependency-update helm-charts/charts/*"
-                    sh "ls -l"
-                }
+                sh "helm package --dependency-update helm-charts/charts/*"
+                sh "ls -l"
             }
     }
 }
