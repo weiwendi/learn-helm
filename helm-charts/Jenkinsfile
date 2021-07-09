@@ -11,7 +11,7 @@ kind: Pod
 spec:
   containers:
   - name: test-and-lint
-    image: registry.cn-beijing.aliyuncs.com/sretech/jhelm:3.5.4
+    image: registry.cn-beijing.aliyuncs.com/sretech/jct:3.4.0
     command:
     - sleep
     args:
@@ -40,7 +40,9 @@ spec:
         }	
         stage("Lint") {
             steps {
-                echo "lint"
+                script {
+                    sh "ct lint"
+                }
             }
         }
         stage("Helm Package") {
