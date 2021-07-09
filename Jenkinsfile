@@ -41,7 +41,7 @@ spec:
         stage("Lint") {
             steps {
                 script {
-                    sh "ct lint"
+                    sh "whoami"
                 }
             }
         }
