@@ -11,7 +11,6 @@ kind: Pod
 spec:
   containers:
   - name: test-and-lint
-    //image: registry.cn-beijing.aliyuncs.com/sretech/jskubectl:1.21.1
     image: registry.cn-beijing.aliyuncs.com/sretech/jhelm:3.5.4
     command:
     - sleep
@@ -44,9 +43,13 @@ spec:
                 echo "lint"
             }
         }
+        stage("Helm Package") {
             steps {
-                sh "helm package --dependency-update helm-charts/charts/*"
-                sh "ls -l"
+                script {
+                    sh "helm package --dependency-update helm-charts/charts/*"
+                    sh "ls -l"
+                }
             }
+        }
     }
 }
