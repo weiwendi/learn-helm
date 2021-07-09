@@ -11,7 +11,7 @@ kind: Pod
 spec:
   containers:
   - name: test-and-lint
-    image: registry.cn-beijing.aliyuncs.com/sretech/jct:3.4.0
+    image: registry.cn-beijing.aliyuncs.com/sretech/jsct:3.4.0
     command:
     - sleep
     args:
