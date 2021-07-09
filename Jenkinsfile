@@ -34,9 +34,7 @@ spec:
         stage('Print Messages') {
             steps {
                 container("test-and-lint") {
-                    echo "workspace: ${WORKSPACE}\n build_id: ${BUILD_ID}"
-                    echo "githubPagesRepoUrl: ${githubPagesRepoUrl} branch(gitlab 分支): ${env.BRANCH_NAME}"
-                    echo "githubForkUrl: ${githubForkUrl}"
+                    echo "workspace: ${WORKSPACE}\n githubPagesRepoUrl: ${githubPagesRepoUrl}\n githubForkUrl: ${githubForkUrl}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
                 }
             }
         }	
