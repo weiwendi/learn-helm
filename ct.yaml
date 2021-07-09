@@ -1,5 +1,5 @@
 chart-dirs:
-  - helm-charts
+  - helm-charts/charts
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
   - mycharts=https://weiwendi.github.io/charts
