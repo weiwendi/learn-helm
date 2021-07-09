@@ -10,7 +10,7 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: testAndLint
+  - name: test-and-lint
     image: quay.io/helmpack/chart-testing:v3.0.0-beta.1
     command:
     - sleep
@@ -21,7 +21,7 @@ spec:
             // container('shell') {
             //     sh 'hostname'
             // }
-            defaultContainer 'testAndLint'
+            defaultContainer 'test-and-lint'
         }
     }
 	
@@ -33,7 +33,7 @@ spec:
     stages {
         stage('Print Messages') {
             steps {
-                container("testAndLint") {
+                container("test-and-lint") {
                     echo "workspace: ${WORKSPACE}\n build_id: ${BUILD_ID}"
                     echo "githubPagesRepoUrl: ${githubPagesRepoUrl} branch(gitlab 分支): ${env.BRANCH_NAME}"
                     echo "githubForkUrl: ${githubForkUrl}"
