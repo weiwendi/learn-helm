@@ -1,7 +1,7 @@
-# jenkins
 pipeline {
     environment {
-	    NAME = 'weiwendi'
+        githubPagesRepoUrl = 'https://github.com/weiwendi/learn-helm.git'  // Helm Charts 源代码仓库
+        githubForkUrl = 'https://github.com/weiwendi/charts.git'  // Helm Charts 包存储库
 	}
     agent {
         kubernetes {
@@ -26,29 +26,24 @@ spec:
     }
 	
     options {
+        timestamps()
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 	
     stages {
-        stage("Lint") {
-            steps {
-                
-                    sh "ct lint"
-                
-            }
-        }
-		
-        stage("Install & Test") {
+        stage('Print Messages') {
             steps {
                 container("testAndLint") {
-                    sh "ct install --upgrade"
+                    echo "workspace: ${WORKSPACE}\n build_id: ${BUILD_ID}"
+                    echo "githubPagesRepoUrl: ${githubPagesRepoUrl} branch(gitlab 分支): ${env.BRANCH_NAME}"
+                    echo "githubForkUrl: ${githubForkUrl}"
                 }
             }
+        }	
+        stage("Lint") {
+            steps {
+                sh "ct lint"
+            }
         }
-		stage("Test variable") {
-		    steps {
-			    echo "${env.NAME}"
-			}
-		}
     }
 }
