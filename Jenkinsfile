@@ -46,7 +46,7 @@ spec:
         stage("Helm Package") {
             steps {
                 script {
-                    sh "helm package --dependency-update helm-charts/charts/*"
+                    sh "helm package --dependency-update helm-charts/*"
                     sh "ls -l"
                 }
             }
