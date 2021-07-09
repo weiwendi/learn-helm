@@ -11,7 +11,7 @@ kind: Pod
 spec:
   containers:
   - name: test-and-lint
-    image: quay.io/helmpack/chart-testing:v3.0.0-beta.1
+    image: registry.cn-beijing.aliyuncs.com/sretech/jskubectl:1.21.1
     command:
     - sleep
     args:
@@ -42,7 +42,7 @@ spec:
         }	
         stage("Lint") {
             steps {
-                sh "ct lint"
+                echo "lint"
             }
         }
     }
