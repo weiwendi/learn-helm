@@ -3,9 +3,11 @@ pipeline {
     // 设置环境变量.
     // 这两个环境变量是图表源代码仓库和图表存储库.
     environment {
-        githubPagesRepoUrl = 'https://github.com/weiwendi/learn-helm.git'  // Helm Charts 源代码仓库
-        githubForkUrl = 'https://github.com/weiwendi/charts.git'  // Helm Charts 包存储库
-	}
+        // Helm Charts 源代码仓库
+        githubPagesRepoUrl = 'https://github.com/weiwendi/learn-helm.git'
+        // Helm Charts 包存储库
+        githubForkUrl = 'https://github.com/weiwendi/charts.git'
+    }
     // 定义执行 Job 的 jenkins agent.
     // agent 是运行在 Kubernetes 集群中的一个 Pod. 
     agent {
@@ -17,7 +19,7 @@ spec:
   containers:
     // 定义容器的名称
   - name: test-and-release
-    // 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl 工具
+    // 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
     image: registry.cn-beijing.aliyuncs.com/sretech/jct:3.4.0
     command:
     - sleep
