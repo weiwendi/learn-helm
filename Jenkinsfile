@@ -1,13 +1,11 @@
 // 通过 Jenkinsfile 定义 pipeline.
 pipeline {
-    
-    // 设置环境变量
+    // 设置环境变量.
     // 这两个环境变量是图表源代码仓库和图表存储库.
     environment {
         githubPagesRepoUrl = 'https://github.com/weiwendi/learn-helm.git'  // Helm Charts 源代码仓库
         githubForkUrl = 'https://github.com/weiwendi/charts.git'  // Helm Charts 包存储库
 	}
-
     // 定义执行 Job 的 jenkins agent.
     // agent 是运行在 Kubernetes 集群中的一个 Pod. 
     agent {
@@ -25,6 +23,7 @@ spec:
     - sleep
     args:
     - infinity
+'''
             // 设置执行各 stages 时默认使用 test-and-release 容器
             defaultContainer 'test-and-release'
         }
