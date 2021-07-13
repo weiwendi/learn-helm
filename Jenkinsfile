@@ -17,9 +17,9 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-    // 定义容器的名称
+    # 定义容器的名称
   - name: test-and-release
-    // 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
+    # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
     image: registry.cn-beijing.aliyuncs.com/sretech/jct:3.4.0
     command:
     - sleep
