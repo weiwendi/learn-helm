@@ -1,3 +1,4 @@
+target-branch: main
 chart-dirs:
   - helm-charts/charts
 chart-repos:
