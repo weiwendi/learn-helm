@@ -117,7 +117,7 @@ spec:
 		        // Add and commit the changes
 		        sh "git add --all"
 			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
-			withCredentials([usernameColonPassword(credentialsId: 'github-auth', variable: 'USERPASS')]) {
+			withCredentials([usernameColonPassword(credentialsId: 'github-auth', variable: 'Itiancai5')]) {
 			    script {
 
 			        // Inject GitHub auth and push to the repo where charts are being served
