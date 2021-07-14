@@ -91,9 +91,12 @@ spec:
         stage("Push Charts to Chart Repo") {
             steps {
                 script {
-                    def baseBranch = "master"
-                    sh "ct lint"
-                    echo "${env.GITHUB_PAGES_BASE_BRANCH}"
+                    def baseBranch = "main"
+		    if (env.GITHUB_PAGES_BASE_BRANCH) {
+	            baseBranch = env.GITHUB_PAGES_BASE_BRANCH
+		    }
+                        sh "git clone ${env.GITHUB_PAGES_REPO_URL} chart-repo"
+                        sh "ls -l"
                 }
             }
         }
