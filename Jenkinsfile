@@ -5,10 +5,14 @@ pipeline {
     // 这两个环境变量是图表源代码仓库和图表存储库.
     // 你需要把这两个地址修改为你的真实地址.
     environment {
+
         // Helm Charts 源代码仓库
         githubForkUrl = 'https://github.com/weiwendi/learn-helm.git'
+
         // Helm Charts 包存储库
         githubPagesRepoUrl = 'https://github.com/weiwendi/charts.git'
+
+        githubAccessKey = credentials('2d511c21-d93e-4f99-ae81-dd631c601922')
     }
 
     // 定义执行 Job 的 jenkins agent.
@@ -103,7 +107,7 @@ spec:
         stage("Push Charts to Chart Repo") {
             steps {
                 script {
-                    def baseBranch = "master"
+                    def baseBranch = "main"
                     sh "git clone ${env.githubPagesRepoUrl} chart-repo"
 
                     def repoType
@@ -129,12 +133,11 @@ spec:
 		        // Add and commit the changes
 		        sh "git add --all"
 			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
-                        withCredentials([usernameColonPassword(credentialsId: 'github-auth', variable: 'USERPASS')]) {
+                        withCredentials([usernameColonPassword(credentialsId: '2d511c21-d93e-4f99-ae81-dd631c601922', variable: 'USERPASS')]) {
 			    script {
 
 			        // Inject GitHub auth and push to the repo where charts are being served
-				// def authRepo = env.githubPagesRepoUrl.replace("://", "://${USERPASS}@")
-				def authRepo = env.githubPagesRepoUrl.replace("://", "://weiwendi@")
+				def authRepo = env.githubPagesRepoUrl.replace("://", "://${USERPASS}@")
 				sh "git push ${authRepo} ${baseBranch}"
 			    }
 			}
