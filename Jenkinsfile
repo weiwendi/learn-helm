@@ -95,7 +95,7 @@ spec:
 		    if (env.GITHUB_PAGES_BASE_BRANCH) {
 	            baseBranch = env.GITHUB_PAGES_BASE_BRANCH
 		    }
-                        sh "git clone ${env.GITHUB_PAGES_REPO_URL} chart-repo"
+                        sh "/usr/bin/git clone ${env.GITHUB_PAGES_REPO_URL} chart-repo"
                         sh "ls -l"
                 }
             }
