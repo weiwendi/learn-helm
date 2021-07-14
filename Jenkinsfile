@@ -93,7 +93,40 @@ spec:
                 script {
                     def baseBranch = "master"
                     sh "git clone ${env.githubPagesRepoUrl} chart-repo"
-                    sh "ls -l"
+
+                    def repoType
+                    if (env.BRANCH_NAME == baseBranch) {
+                        repoType = "stable"
+                    } else {
+                        repoType = "staging"
+                    }
+
+                    def files = sh(script: "ls chart-repo", returnStdout: true)
+                    if (!files.contains(repoType)) {
+                        sh "mkdir chart-repo/${repoType}"
+                    }
+
+                    sh "mv *.tgz chart-repo/${repoType}"
+
+                    sh "helm repo index chart-repo/${repoType}"
+
+                    sh "git config --global user.email 'weiwendi@live.cn'"
+                    sh "git config --global user.name 'weiwendi'"
+
+                    dir("chart-repo") {
+		        // Add and commit the changes
+		        sh "git add --all"
+			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
+			withCredentials([usernameColonPassword(credentialsId: 'github-auth', variable: 'USERPASS')]) {
+			    script {
+
+			        // Inject GitHub auth and push to the repo where charts are being served
+				def authRepo = env.githubPagesRepoUrl.replace("://", "://${USERPASS}@")
+				sh "git push ${authRepo} ${baseBranch}"
+			    }
+			}
+                    }
+
                 }
             }
         }
