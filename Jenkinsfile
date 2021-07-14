@@ -60,6 +60,14 @@ spec:
             }
         }	
 
+        stage("List Changed Charts") {
+            steps {
+                script {
+                    sh "ct list-changed"
+                }
+            }
+        }
+
         stage("Lint") {
             steps {
                 script {
