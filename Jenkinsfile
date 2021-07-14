@@ -1,4 +1,4 @@
-// 通过 Jenkinsfile 定义 pipeline.
+// 声明 Pipeline.
 pipeline {
     // 设置环境变量.
     // 这两个环境变量是图表源代码仓库和图表存储库.
@@ -20,7 +20,7 @@ spec:
     # 定义容器的名称
   - name: test-and-release
     # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
-    image: registry.cn-beijing.aliyuncs.com/sretech/jct:3.4.0
+    image: registry.cn-beijing.aliyuncs.com/sretech/cttools:latest
     command:
     - sleep
     args:
@@ -42,7 +42,7 @@ spec:
     // stages 设置 pipeline 执行的各个阶段,建议至少包含一个 stage.
     stages {
         // stage 定义了 pipeline 完成的所有实际工作.
-        stage('Print Build Messages') {
+        stage('Build Messages') {
             // steps 定义了 pipeline 具体执行的步骤.
             steps {
                 container("test-and-release") {
@@ -50,18 +50,39 @@ spec:
                 }
             }
         }	
-        stage("Print Changed Charts") {
+        stage("Changed Charts") {
             steps {
                 script {
                     sh "ct list-changed"
                 }
             }
         }
-        stage("Helm Package") {
+        stage("Lint") {
+            steps {
+                script {
+                    sh "ct lint"
+                }
+            }
+        }
+        stage("test & install") {
+            steps {
+                script {
+                    sh "ct install --upgrade"
+                }
+            }
+        }
+        stage("Helm Packages") {
             steps {
                 script {
                     sh "helm package --dependency-update helm-charts/charts/*"
                     sh "ls -l"
+                }
+            }
+        }
+        stage("push packages to repo") {
+            steps {
+                script {
+                    sh "ct lint"
                 }
             }
         }
