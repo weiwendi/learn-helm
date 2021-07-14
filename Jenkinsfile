@@ -93,7 +93,7 @@ spec:
                 script {
                     def baseBranch = "master"
                     sh "ct lint"
-                    echo ${env.GITHUB_PAGES_BASE_BRANCH}
+                    echo "${env.GITHUB_PAGES_BASE_BRANCH}"
                 }
             }
         }
