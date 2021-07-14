@@ -28,6 +28,15 @@ spec:
     - sleep
     args:
     - infinity
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "1000m"
+      limits:
+        memory: "1024Mi"
+        cpu: "1000m"
+  nodeSelector:
+    public: yes
 '''
             // 设置执行各 stages 时默认使用 test-and-release 容器
             defaultContainer 'test-and-release'
