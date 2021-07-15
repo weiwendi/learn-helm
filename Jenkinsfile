@@ -133,11 +133,11 @@ spec:
 		        // Add and commit the changes
 		        sh "git add --all"
 			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
-                        withCredentials([usernameColonPassword(credentialsId: '2d511c21-d93e-4f99-ae81-dd631c601922', variable: 'USERPASS')]) {
+                        withCredentials([usernameColonPassword(credentialsId: '2d511c21-d93e-4f99-ae81-dd631c601922', passwordVariable: 'Password', usernameVariable: 'Username')]) {
 			    script {
 
 			        // Inject GitHub auth and push to the repo where charts are being served
-				def authRepo = env.githubPagesRepoUrl.replace("://", "://${USERPASS}@")
+				def authRepo = env.githubPagesRepoUrl.replace("://", "://${Username}:${Password}@")
 				sh "git push ${authRepo} ${baseBranch}"
 			    }
 			}
