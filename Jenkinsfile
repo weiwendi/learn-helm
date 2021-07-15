@@ -7,10 +7,10 @@ pipeline {
     environment {
 
         // Helm Charts 源代码仓库
-        githubForkUrl = 'https://github.com/weiwendi/learn-helm.git'
+        githubForkUrl = 'https://gitee.com/sretech/learn-helm.git'
 
         // Helm Charts 包存储库
-        githubPagesRepoUrl = 'https://github.com/weiwendi/charts.git'
+        githubPagesRepoUrl = 'https://gitee.com/sretech/charts.git'
 
         githubAccessKey = credentials('2d511c21-d93e-4f99-ae81-dd631c601922')
     }
