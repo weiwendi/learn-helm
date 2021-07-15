@@ -122,7 +122,7 @@ spec:
                         sh "mkdir chart-repo/${repoType}"
                     }
 
-                    sh "mv *.tgz chart-repo/${repoType}"
+                    sh "mv ct.yaml chart-repo/${repoType}"
 
                     sh "helm repo index chart-repo/${repoType}"
 
