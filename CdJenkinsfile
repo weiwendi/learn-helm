@@ -72,7 +72,7 @@ spec:
                 
                 // 指定使用哪个容器执行该 steps,默认是 test-and-release-cd,这里用来演示 container 的用法.
                 container("test-and-release-cd") {
-                    echo " workspace: ${WORKSPACE}\n githubChartRepoPagesUrl: ${githubChartRepoPagesUrl}\n githubForkUrl: ${githubForkUrl}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
+                    echo " workspace: ${WORKSPACE}\n githubChartRepoPagesUrl: ${githubChartRepoPagesUrl}\n} branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
                 }
             }
         }	
