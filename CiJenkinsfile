@@ -10,7 +10,7 @@ pipeline {
 
         // 定义凭证变量，gitabc 是我们在 Jenkins 控制台创建的凭证 ID;
         // GITAUTH 变量在向 githubPagesRepoUrl 推送 Charts 包的时候会用到.
-        GITAUTH = credentials('gitabc')
+        GITAUTH = credentials('github')
 
         // kubeconfig
         KUBECONFIG = credentials('kubeconfig')
