@@ -1,21 +1,23 @@
-// 声明 Pipeline.
+// 声明 CI Pipeline.
 pipeline {
 
-    // environment 用于设置环境变量.
-    // 这两个环境变量是图表源代码仓库和图表存储库.
-    // 你需要把这两个地址修改为你的真实地址.
+    // environment 用于设置变量,变量作用域是该管道;
     environment {
 
-        // Helm Charts 源代码仓库
-        githubForkUrl = 'https://gitee.com/sretech/learn-helm.git'
+        // 为 Helm Charts 源代码仓库及 Helm Charts Package 仓库设置变量.
+        githubForkUrl = 'https://github.com/weiwendi/learn-helm.git'
+        githubPagesRepoUrl = 'https://github.com/weiwendi/charts.git'
 
-        // Helm Charts 包存储库
-        githubPagesRepoUrl = 'https://gitee.com/sretech/charts.git'
+        // 定义凭证变量，gitabc 是我们在 Jenkins 控制台创建的凭证 ID;
+        // GITAUTH 变量在向 githubPagesRepoUrl 推送 Charts 包的时候会用到.
+        GITAUTH = credentials('gitabc')
 
-        githubAccessKey = credentials('2d511c21-d93e-4f99-ae81-dd631c601922')
+        // kubeconfig
+        KUBECONFIG = credentials('kubeconfig')
     }
 
-    // 定义执行 Job 的 jenkins agent.
+
+    // 定义执行 Job 的 jenkins agent;
     // agent 是运行在 Kubernetes 集群中的一个 Pod. 
     agent {
         kubernetes {
@@ -23,9 +25,14 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
+  serviceAccountName: jenkins
+  hostAliases:
+  - hostnames:
+    - inner-k8s.9f.cn
+    ip: 192.168.64.1
   containers:
     # 定义容器的名称
-  - name: test-and-release
+  - name: test-and-release-ci
     # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
     image: registry.cn-beijing.aliyuncs.com/sretech/cttools:latest
     command:
@@ -39,11 +46,12 @@ spec:
       limits:
         memory: "1024Mi"
         cpu: "1000m"
+  # 选择标签是 public: yes 的节点运行该 Pod.
   nodeSelector:
     public: yes
 '''
-            // 设置执行各 stages 时默认使用 test-and-release 容器
-            defaultContainer 'test-and-release'
+            // 设置执行各 stages 时默认使用 test-and-release-ci 容器
+            defaultContainer 'test-and-release-ci'
         }
     }
 	
@@ -57,7 +65,7 @@ spec:
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
-    // stages 设置 pipeline 执行的各个阶段,建议至少包含一个 stage.
+    // 设置 pipeline 执行的各个阶段,建议至少包含一个 stage.
     stages {
 
         // stage 定义了 pipeline 完成的所有实际工作.
@@ -66,13 +74,23 @@ spec:
             // steps 定义了 pipeline 具体执行的步骤.
             steps {
                 
-                // 指定使用哪个容器执行该 steps,默认是 test-and-release.
-                container("test-and-release") {
+                // 指定使用哪个容器执行该 steps,默认是 test-and-release-ci,这里用来演示 container 的用法.
+                container("test-and-release-ci") {
                     echo " workspace: ${WORKSPACE}\n githubPagesRepoUrl: ${githubPagesRepoUrl}\n githubForkUrl: ${githubForkUrl}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
                 }
             }
         }	
 
+        stage("Copy Kubeconfig") {
+            steps {
+                script {
+                    sh """
+                        mkdir -p ~/.kube
+                        cp ${KUBECONFIG} ~/.kube/config
+                    """
+                }
+            }
+        }
         stage("List Changed Charts") {
             steps {
                 script {
@@ -99,7 +117,7 @@ spec:
         stage("Package Charts") {
             steps {
                 script {
-                    // sh "helm package --dependency-update helm-charts/charts/*"
+                    sh "helm package --dependency-update helm-charts/charts/*"
                     sh "ls -l"
                 }
             }
@@ -122,25 +140,26 @@ spec:
                         sh "mkdir chart-repo/${repoType}"
                     }
 
-                    sh "mv ct.yaml chart-repo/${repoType}"
+                    sh """
+                        mv *.tgz chart-repo/${repoType}/
 
-                    sh "helm repo index chart-repo/${repoType}"
+                        helm repo index chart-repo/${repoType}
 
-                    sh "git config --global user.email 'weiwendi@live.cn'"
-                    sh "git config --global user.name 'weiwendi'"
+                        git config --global user.email 'weiwendi@live.cn'
+                        git config --global user.name 'weiwendi'
+                    """
 
                     dir("chart-repo") {
 		        // Add and commit the changes
 		        sh "git add --all"
 			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
-                        withCredentials([usernameColonPassword(credentialsId: 'gitabc', passwordVariable: 'Password', usernameVariable: 'Username')]) {
-			    script {
+			script {
 
-			        // Inject GitHub auth and push to the repo where charts are being served
-				def authRepo = env.githubPagesRepoUrl.replace("://", "://${Username}:${Password}@")
-				sh "git push ${authRepo} ${baseBranch}"
-			    }
-			}
+			    // Inject GitHub auth and push to the repo where charts are being served
+		            def authRepo = env.githubPagesRepoUrl.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
+			    sh "git push ${authRepo} ${baseBranch}"
+		        }
+
                     }
 
                 }
