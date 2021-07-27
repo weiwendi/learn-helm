@@ -90,8 +90,7 @@ spec:
         stage("Add Chart") {
             steps {
                 script {
-                    sh "helm repo add learnhelm ${env.githubChartRepoPagesUrl/stable}"
-                    // sh "helm repo add learnhelm https://charts.aiops.red/stable"
+                    sh "helm repo add learnhelm ${env.githubChartRepoPagesUrl}/stable"
                 }
             }
         }
