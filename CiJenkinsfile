@@ -157,6 +157,7 @@ spec:
 
 			    // Inject GitHub auth and push to the repo where charts are being served
 		            def authRepo = env.githubPagesRepoUrl.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
+                            echo ${env.authRepo}
 			    sh "git push ${authRepo} ${baseBranch}"
 		        }
 
