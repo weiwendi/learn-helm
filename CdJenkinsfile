@@ -105,5 +105,13 @@ spec:
             }
         }
 
+        stage("Smoke Test") {
+            steps {
+                script {
+                        sh "helm test nginx-${env.BRANCH_NAME} -n dev"
+                }
+            }
+        }
+
     }
 }
