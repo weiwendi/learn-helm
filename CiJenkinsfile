@@ -1,7 +1,7 @@
 // 声明 CI Pipeline.
 pipeline {
 
-    // environment 用于设置变量,变量作用域是该管道;
+    // environment 用于设置变量,变量作用域是该管道.
     environment {
 
         // 为 Helm Charts 源代码仓库及 Helm Charts Package 仓库设置变量.
