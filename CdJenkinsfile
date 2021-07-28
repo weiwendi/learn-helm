@@ -108,7 +108,20 @@ spec:
         stage("Smoke Test") {
             steps {
                 script {
-                        sh "helm test nginx-${env.BRANCH_NAME} -n dev"
+                    sh "helm test nginx-${env.BRANCH_NAME} -n dev"
+                }
+            }
+        }
+
+        stage("Deploy to QA") {
+            when {
+                expression {
+                    return env.BRANCH_NAME == "main"
+                }
+            }
+            steps {
+                dir("nginx-cd") {
+                    sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values qa/values.yaml -n qa --wait"
                 }
             }
         }
