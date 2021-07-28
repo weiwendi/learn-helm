@@ -13,3 +13,5 @@ spec:
       command: ['wget']
       args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
+  nodeSelector:
+    roles: cicd
