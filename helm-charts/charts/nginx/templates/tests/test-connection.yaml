@@ -7,12 +7,14 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
-  containers:
-    - name: wget
-      image: rockylinux/rockylinux
-      command: ['wget']
-      args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
-  restartPolicy: Never
-  nodeSelector:
-    roles: cicd
-  ttlSecondsAfterFinished: 60
+  template:
+    spec:
+      containers:
+      - name: curl
+        image: rockylinux/rockylinux
+        command: ['wget']
+        args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
+      restartPolicy: Never
+      nodeSelector:
+        roles: cicd
+      ttlSecondsAfterFinished: 60
