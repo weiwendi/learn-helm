@@ -8,9 +8,9 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: curl
+    - name: wget
       image: rockylinux/rockylinux
-      command: ['curl']
+      command: ['wget']
       args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
   nodeSelector:

@@ -101,7 +101,7 @@ spec:
 
         stage("Lint") {
             steps {
-                script {
+                container("test-and-release-ci") {
                     sh "ct lint"
                 }
             }
