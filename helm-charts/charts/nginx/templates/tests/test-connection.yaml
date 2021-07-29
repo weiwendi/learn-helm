@@ -10,7 +10,7 @@ spec:
   containers:
     - name: wget
       image: busybox
-      command: ['wget']
+      command: ['curl']
       args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
   nodeSelector:
