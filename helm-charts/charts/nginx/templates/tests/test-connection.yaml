@@ -7,6 +7,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
 spec:
+  ttlSecondsAfterFinished: 60
   template:
     spec:
       containers:
@@ -17,4 +18,3 @@ spec:
       restartPolicy: Never
       nodeSelector:
         roles: cicd
-      ttlSecondsAfterFinished: 60
