@@ -61,7 +61,7 @@ spec:
         // 显示执行的时间，需要 Timestamper 插件支持.
         timestamps()
 
-        // 保留最近 10 次构建记录
+        // 在 Stage View 中展示近  10 次构建信息
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
@@ -157,7 +157,6 @@ spec:
 
 			    // Inject GitHub auth and push to the repo where charts are being served
 		            def authRepo = env.githubPagesRepoUrl.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
-                            echo ${env.authRepo}
 			    sh "git push ${authRepo} ${baseBranch}"
 		        }
 
