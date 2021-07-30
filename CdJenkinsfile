@@ -123,6 +123,32 @@ spec:
             steps {
                 dir("nginx-cd") {
                     sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values qa/values.yaml -n qa --wait"
+                    sh "kubectl -n dev exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                }
+            }
+        }
+
+        stage("Wait for Input") {
+            when {
+                expression {
+                    return env.BRANCH_NAME == "main"
+                }
+            }
+            steps {
+                input "Deploy to Prod?"
+            }
+        }
+
+        stage("Deploy to Prod") {
+            when {
+                expression {
+                    return env.BRANCH_NAME == "main"
+                }
+            }
+            steps {
+                dir("nginx-cd") {
+                    sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values prod/values.yaml -n prod --wait"
+                    sh "kubectl -n dev exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
                 }
             }
         }
