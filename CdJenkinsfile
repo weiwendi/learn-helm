@@ -135,7 +135,10 @@ spec:
                 }
             }
             steps {
-                input "Deploy to Prod?"
+                input {
+                    message "Deploy to Prod?"
+                    ok "Yes, we should."
+                }
             }
         }
 
