@@ -106,7 +106,7 @@ spec:
             }
         }
 
-        stage("Smoke Test") {
+        stage("Smoke Test DEV") {
             steps {
                 script {
                     sh "helm test nginx-${env.BRANCH_NAME} -n dev"
@@ -124,6 +124,14 @@ spec:
                 dir("nginx-cd") {
                     sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values qa/values.yaml -n qa --wait"
                     sh "kubectl -n qa exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                }
+            }
+        }
+
+        stage("Smoke Test QA") {
+            steps {
+                script {
+                    sh "helm test nginx-${env.BRANCH_NAME} -n qa"
                 }
             }
         }
@@ -149,6 +157,14 @@ spec:
                 dir("nginx-cd") {
                     sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values prod/values.yaml -n prod --wait"
                     sh "kubectl -n prod exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                }
+            }
+        }
+
+        stage("Smoke Test PROD") {
+            steps {
+                script {
+                    sh "helm test nginx-${env.BRANCH_NAME} -n prod"
                 }
             }
         }
