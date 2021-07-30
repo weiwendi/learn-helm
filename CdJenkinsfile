@@ -100,7 +100,7 @@ spec:
                 script {
                     dir("nginx-cd") {
                         sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values dev/values.yaml -n dev --wait"
-                        sh "echo $ENVIRONMENT"
+                        sh "env |grep ENVIRONMENT"
                     }
                 }
             }
