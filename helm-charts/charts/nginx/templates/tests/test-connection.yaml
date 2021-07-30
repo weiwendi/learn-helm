@@ -13,6 +13,6 @@ spec:
       image: rockylinux/rockylinux
       command: ['curl']
       args: ['{{ include "nginx.fullname" . }}:{{ .Values.service.port }}']
-      restartPolicy: Never
-      nodeSelector:
-        roles: cicd
+  restartPolicy: Never
+  nodeSelector:
+    roles: cicd
