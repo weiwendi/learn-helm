@@ -2,3 +2,9 @@ controller:
   serviceType: NodePort
   installPlugins:
     - workflow-multibranch:2.26
+    - workflow-multibranch:2.26
+    - workflow-multibranch:2.26
+    - kubernetes:1.29.4
+    - workflow-aggregator:2.6
+    - git:4.7.1
+    - configuration-as-code:1.51
