@@ -8,3 +8,4 @@ controller:
     - workflow-aggregator:2.6
     - git:4.7.1
     - configuration-as-code:1.51
+    - credentials:2.5
