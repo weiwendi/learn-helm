@@ -1,2 +1,4 @@
 controller:
   serviceType: NodePort
+  installPlugins:
+    - workflow-multibranch:2.26
