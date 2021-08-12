@@ -1,0 +1,169 @@
+// 声明 CI 管道.
+pipeline {
+
+    // environment 用于设置变量,变量作用域是该管道.
+    environment {
+
+        // 为 Helm Charts 源代码仓库及 Helm Charts Package 仓库设置变量.
+        githubForkUrl = 'https://github.com/weiwendi/learn-helm.git'
+        githubPagesRepoUrl = 'https://github.com/weiwendi/charts.git'
+
+        // 定义凭证变量，gitabc 是我们在 Jenkins 控制台创建的凭证 ID;
+        // GITAUTH 变量在向 githubPagesRepoUrl 推送 Charts 包的时候会用到.
+        GITAUTH = credentials('github')
+
+        // kubeconfig
+        KUBECONFIG = credentials('kubeconfig')
+    }
+
+
+    // 定义执行 Job 的 jenkins agent;
+    // agent 是运行在 Kubernetes 集群中的一个 Pod. 
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  hostAliases:
+  - hostnames:
+    - inner-k8s.9f.cn
+    ip: 192.168.64.1
+  containers:
+    # 定义容器的名称
+  - name: test-and-release-ci
+    # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
+    image: registry.cn-beijing.aliyuncs.com/sretech/cttools:latest
+    command:
+    - sleep
+    args:
+    - infinity
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "1000m"
+      limits:
+        memory: "1024Mi"
+        cpu: "1000m"
+  # 选择标签是 public: yes 的节点运行该 Pod.
+  nodeSelector:
+    public: yes
+'''
+            // 设置执行各 stages 时默认使用 test-and-release-ci 容器
+            defaultContainer 'test-and-release-ci'
+        }
+    }
+	
+    // Jenkins 选项
+    options {
+
+        // 显示执行的时间，需要 Timestamper 插件支持.
+        timestamps()
+
+        // 在 Stage View 中展示近  10 次构建信息
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    // 设置 pipeline 执行的各个阶段,建议至少包含一个 stage.
+    stages {
+
+        // stage 定义了 pipeline 完成的所有实际工作.
+        stage('Build Messages') {
+
+            // steps 定义了 pipeline 具体执行的步骤.
+            steps {
+                
+                // 指定使用哪个容器执行该 steps,默认是 test-and-release-ci,这里用来演示 container 的用法.
+                container("test-and-release-ci") {
+                    echo " workspace: ${WORKSPACE}\n githubPagesRepoUrl: ${githubPagesRepoUrl}\n githubForkUrl: ${githubForkUrl}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
+                }
+            }
+        }	
+
+        stage("Copy Kubeconfig") {
+            steps {
+                script {
+                    sh """
+                        mkdir -p ~/.kube
+                        cp ${KUBECONFIG} ~/.kube/config
+                    """
+                }
+            }
+        }
+        stage("List Changed Charts") {
+            steps {
+                script {
+                    sh "ct list-changed"
+                }
+            }
+        }
+
+        stage("Lint") {
+            steps {
+                container("test-and-release-ci") {
+                    sh "ct lint"
+                }
+            }
+        }
+
+        stage("Install & Test") {
+            steps {
+                script {
+                    sh "ct install --upgrade"
+                }
+            }
+        }
+        stage("Package Charts") {
+            steps {
+                script {
+                    sh "helm package --dependency-update helm-charts/charts/*"
+                    sh "ls -l"
+                }
+            }
+        }
+        stage("Push Charts to Chart Repo") {
+            steps {
+                script {
+                    def baseBranch = "main"
+                    sh "git clone ${env.githubPagesRepoUrl} chart-repo"
+
+                    def repoType
+                    if (env.BRANCH_NAME == baseBranch) {
+                        repoType = "stable"
+                    } else {
+                        repoType = "staging"
+                    }
+
+                    def files = sh(script: "ls chart-repo", returnStdout: true)
+                    if (!files.contains(repoType)) {
+                        sh "mkdir chart-repo/${repoType}"
+                    }
+
+                    sh """
+                        mv *.tgz chart-repo/${repoType}/
+
+                        helm repo index chart-repo/${repoType}
+
+                        git config --global user.email 'weiwendi@live.cn'
+                        git config --global user.name 'weiwendi'
+                    """
+
+                    dir("chart-repo") {
+		        // Add and commit the changes
+		        sh "git add --all"
+			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
+			script {
+
+			    // Inject GitHub auth and push to the repo where charts are being served
+		            def authRepo = env.githubPagesRepoUrl.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
+			    sh "git push ${authRepo} ${baseBranch}"
+		        }
+
+                    }
+
+                }
+            }
+        }
+    }
+}
