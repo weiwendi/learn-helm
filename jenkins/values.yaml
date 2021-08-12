@@ -12,3 +12,4 @@ controller:
     - pipeline-model-api:1.9.1
     - pipeline-model-definition:1.9.1
     - junit:1.52
+    - timestamper:1.13
