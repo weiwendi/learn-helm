@@ -1,4 +1,4 @@
-// 声明 CD Pipeline.
+// 声明 CD 管道.
 pipeline {
 
     // environment 用于设置变量,变量作用域是该管道;
