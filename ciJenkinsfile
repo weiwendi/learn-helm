@@ -122,8 +122,11 @@ spec:
             steps {
                 script {
                     def baseBranch = "main"
+
+                    // 克隆 Helm Chart Package 包存储库到 chart-repo 目录.
                     sh "git clone ${env.gitPackageRepo} chart-repo"
 
+                    // 使用 if 语句，根据分支判断图表包应该推送到 stable 或是 staging 目录.
                     def repoType
                     if (env.BRANCH_NAME == baseBranch) {
                         repoType = "stable"
@@ -131,6 +134,7 @@ spec:
                         repoType = "staging"
                     }
 
+                    // 如果不存在，创建 stable 或 staging 目录.
                     def files = sh(script: "ls chart-repo", returnStdout: true)
                     if (!files.contains(repoType)) {
                         sh "mkdir chart-repo/${repoType}"
