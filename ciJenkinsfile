@@ -118,7 +118,7 @@ spec:
                 """
             }
         }
-        stage("Push Charts to Chart Repo") {
+        stage("Push Charts to gitPackageRepo") {
             steps {
                 script {
                     def baseBranch = "main"
@@ -138,17 +138,19 @@ spec:
 
                     sh """
                         mv *.tgz chart-repo/${repoType}/
-
                         helm repo index chart-repo/${repoType}
-
                         git config --global user.email 'weiwendi@live.cn'
                         git config --global user.name 'weiwendi'
                     """
 
                     dir("chart-repo") {
-		        // Add and commit the changes
-		        sh "git add --all"
-			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
+		        // Add and commit the changes.
+		        sh """
+		            git add --all
+			    git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'
+			"""
+
+                        // Push Chart Packages to gitPackageRepo. 
 			script {
 			    // Inject GitHub auth and push to the repo where charts are being served
 		            def authRepo = env.gitPackageRepo.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
