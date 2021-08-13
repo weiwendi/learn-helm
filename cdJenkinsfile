@@ -79,10 +79,12 @@ spec:
 
         stage("Copy Kubeconfig") {
             steps {
+                script {
                 sh """
                     mkdir -p ~/.kube
                     cp ${KUBECONFIG} ~/.kube/config
                 """
+            }
             }
         }
         stage("Add Chart") {
