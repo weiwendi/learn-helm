@@ -77,6 +77,17 @@ spec:
             }
         }	
 
+        stage("Copy Kubeconfig") {
+            steps {
+                script {
+                    sh """
+                        mkdir -p ~/.kube
+                        cp ${KUBECONFIG} ~/.kube/config
+                    """
+                }
+            }
+        }
+
         stage("Add Chart") {
             steps {
                 sh "helm repo add aiops ${env.gitPackageRepoPage}/stable"
@@ -87,9 +98,6 @@ spec:
             steps {
                 script {
                     dir("nginx-cd") {
- withKubeConfig([credentialsId: 'kubeconfig']) {
-      sh 'kubectl get nodes'
-    }
                         sh """
                             helm --kubeconfig $KUBECONFIG upgrade --install nginx-${env.BRANCH_NAME} aiops/nginx --values common-values.yaml --values dev/values.yaml -n dev --wait
                             kubectl --kubeconfig $KUBECONFIG -n dev exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT
