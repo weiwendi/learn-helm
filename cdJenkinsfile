@@ -1,11 +1,11 @@
-// 声明 CD Pipeline.
+// 声明 CD 管道.
 pipeline {
 
     // environment 用于设置变量,变量作用域是该管道;
     environment {
 
-        // 设置 charts repo 地址
-        githubChartRepoPagesUrl = 'https://charts.aiops.red'
+        // 设置图表存储库的地址
+        gitPackageRepoPage = 'https://charts.aiops.red'
 
         // 定义 kubeconfig 凭证变量，kubeconfig 是我们在 Jenkins 控制台创建的凭证 ID;
         // helm/kubectl 与 Kubernetes 交互时，需要 kubeconfig 验证. 
@@ -42,7 +42,7 @@ spec:
       limits:
         memory: "1024Mi"
         cpu: "1000m"
-  # 选择标签是 public: yes 的节点运行该 Pod.
+  # 选择标签是 roles=cicd 的节点运行该 Pod.
   nodeSelector:
     roles: cicd
 '''
@@ -72,7 +72,7 @@ spec:
                 
                 // 指定使用哪个容器执行该 steps,默认是 test-and-release-cd,这里用来演示 container 的用法.
                 container("test-and-release-cd") {
-                    echo " workspace: ${WORKSPACE}\n githubChartRepoPagesUrl: ${githubChartRepoPagesUrl}\n} branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
+                    echo " workspace: ${WORKSPACE}\n gitPackageRepoPage: ${gitPackageRepoPage}\n} branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
                 }
             }
         }	
@@ -80,18 +80,16 @@ spec:
         stage("Copy Kubeconfig") {
             steps {
                 script {
-                    sh """
-                        mkdir -p ~/.kube
-                        cp ${KUBECONFIG} ~/.kube/config
-                    """
-                }
+                sh """
+                    mkdir -p ~/.kube
+                    cp ${KUBECONFIG} ~/.kube/config
+                """
+            }
             }
         }
         stage("Add Chart") {
             steps {
-                script {
-                    sh "helm repo add learnhelm ${env.githubChartRepoPagesUrl}/stable"
-                }
+                sh "helm repo add aiops ${env.gitPackageRepoPage}/stable"
             }
         }
 
@@ -99,8 +97,10 @@ spec:
             steps {
                 script {
                     dir("nginx-cd") {
-                        sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values dev/values.yaml -n dev --wait"
-                        sh "kubectl -n dev exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                        sh """
+                            helm upgrade --install nginx-${env.BRANCH_NAME} aiops/nginx --values common-values.yaml --values dev/values.yaml -n dev --wait
+                            kubectl -n dev exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT
+                        """
                     }
                 }
             }
@@ -108,9 +108,7 @@ spec:
 
         stage("Smoke Test DEV") {
             steps {
-                script {
-                    sh "helm test nginx-${env.BRANCH_NAME} -n dev"
-                }
+                sh "helm test nginx-${env.BRANCH_NAME} -n dev"
             }
         }
 
@@ -122,17 +120,17 @@ spec:
             }
             steps {
                 dir("nginx-cd") {
-                    sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values qa/values.yaml -n qa --wait"
-                    sh "kubectl -n qa exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                    sh """
+                        helm upgrade --install nginx-${env.BRANCH_NAME} aiops/nginx --values common-values.yaml --values qa/values.yaml -n qa --wait
+                        kubectl -n qa exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT
+                    """
                 }
             }
         }
 
         stage("Smoke Test QA") {
             steps {
-                script {
-                    sh "helm test nginx-${env.BRANCH_NAME} -n qa"
-                }
+                sh "helm test nginx-${env.BRANCH_NAME} -n qa"
             }
         }
 
@@ -155,17 +153,17 @@ spec:
             }
             steps {
                 dir("nginx-cd") {
-                    sh "helm upgrade --install nginx-${env.BRANCH_NAME} learnhelm/nginx --values common-values.yaml --values prod/values.yaml -n prod --wait"
-                    sh "kubectl -n prod exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT"
+                    sh """
+                        helm upgrade --install nginx-${env.BRANCH_NAME} aiops/nginx --values common-values.yaml --values prod/values.yaml -n prod --wait
+                        kubectl -n prod exec deploy/nginx-${env.BRANCH_NAME} -- env | grep ENVIRONMENT
+                    """
                 }
             }
         }
 
         stage("Smoke Test PROD") {
             steps {
-                script {
-                    sh "helm test nginx-${env.BRANCH_NAME} -n prod"
-                }
+                sh "helm test nginx-${env.BRANCH_NAME} -n prod"
             }
         }
 
