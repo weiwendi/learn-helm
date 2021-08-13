@@ -44,7 +44,7 @@ spec:
         cpu: "1000m"
   # 选择标签是 public: yes 的节点运行该 Pod.
   nodeSelector:
-    public: yes
+    roles: cicd
 '''
             // 设置执行各 stages 时默认使用 test-and-release-cd 容器
             defaultContainer 'test-and-release-cd'
