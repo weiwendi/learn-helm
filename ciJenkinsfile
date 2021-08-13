@@ -141,8 +141,13 @@ spec:
                     }
 
                     sh """
+                        // 将图表包移动到 chart-repo 的 stable 或 staging 目录中.
                         mv *.tgz chart-repo/${repoType}/
+
+                        // 更新 index.html.
                         helm repo index chart-repo/${repoType}
+
+                        // 更新 git 配置信息，需要把邮箱、用户名改为你自己的.
                         git config --global user.email 'weiwendi@live.cn'
                         git config --global user.name 'weiwendi'
                     """
