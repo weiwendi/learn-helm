@@ -31,6 +31,7 @@ spec:
   - name: test-and-release-cd
     # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
     image: registry.cn-beijing.aliyuncs.com/sretech/cttools:latest
+    imagePullPolicy: IfNotPresent
     command:
     - sleep
     args:
