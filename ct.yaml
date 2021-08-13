@@ -4,3 +4,4 @@ chart-dirs:
 chart-repos:
   - bitnami=https://charts.bitnami.com/bitnami
   - mycharts=https://weiwendi.github.io/charts
+validate-maintainers: false
