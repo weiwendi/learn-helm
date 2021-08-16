@@ -168,7 +168,7 @@ spec:
                         // 推送图表包到 gitPackageRepo 仓库.
 			script {
 			    // Inject GitHub auth and push to the repo where charts are being served
-		            def authRepo = env.gitPackageRepo.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
+		            def authRepo = env.gitPackageRepo.replace('://', '://${GITAUTH_USR}:${GITAUTH_PSW}@')
 			    sh "git push ${authRepo} ${baseBranch}"
 		        }
 
