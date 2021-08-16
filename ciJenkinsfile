@@ -73,7 +73,7 @@ spec:
 
         // stage 定义了 pipeline 完成的所有实际工作.
         // 首先，我们定义一个打印构建信息的 stage.
-        stage('Print Build Messages') {
+        stage("Print Build Messages") {
 
             // steps 定义了管道中具体执行的步骤.
             steps {
@@ -95,27 +95,27 @@ spec:
         }
         stage("List Changed Charts") {
             steps {
-                sh "ct list-changed"
+                sh 'ct list-changed'
             }
         }
 
         stage("Lint") {
             steps {
-                sh "ct lint"
+                sh 'ct lint'
             }
         }
 
         stage("Install & Test") {
             steps {
-                sh "ct install --upgrade"
+                sh 'ct install --upgrade'
             }
         }
         stage("Package Charts") {
             steps {
-                sh """
+                sh '''
                     helm package --dependency-update helm-charts/charts/*
                     ls -l
-                """
+                '''
             }
         }
         stage("Push Charts to gitPackageRepo") {
@@ -124,7 +124,7 @@ spec:
                     def baseBranch = "main"
 
                     // 克隆 Helm Chart Package 包存储库到 chart-repo 目录.
-                    sh "git clone ${env.gitPackageRepo} chart-repo"
+                    sh 'git clone ${env.gitPackageRepo} chart-repo'
 
                     // 使用 if 语句，根据分支判断图表包应该推送到 stable 或是 staging 目录.
                     def repoType
@@ -137,10 +137,10 @@ spec:
                     // 如果不存在，创建 stable 或 staging 目录.
                     def files = sh(script: "ls chart-repo", returnStdout: true)
                     if (!files.contains(repoType)) {
-                        sh "mkdir chart-repo/${repoType}"
+                        sh 'mkdir chart-repo/${repoType}'
                     }
 
-                    sh """
+                    sh '''
                         // 将图表包移动到 chart-repo 的 stable 或 staging 目录中.
                         mv *.tgz chart-repo/${repoType}/
 
@@ -150,20 +150,20 @@ spec:
                         // 更新 git 配置信息，需要把邮箱、用户名改为你自己的.
                         git config --global user.email 'weiwendi@aiops.red'
                         git config --global user.name 'weiwendi'
-                    """
+                    '''
 
                     dir("chart-repo") {
 		        // Add and commit the changes.
-		        sh """
+		        sh '''
 		            git add --all
 			    git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'
-			"""
+			'''
 
                         // 推送图表包到 gitPackageRepo 仓库.
 			script {
 			    // Inject GitHub auth and push to the repo where charts are being served
 		            def authRepo = env.gitPackageRepo.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
-			    sh "git push ${authRepo} ${baseBranch}"
+			    sh 'git push ${authRepo} ${baseBranch}'
 		        }
 
                     }
