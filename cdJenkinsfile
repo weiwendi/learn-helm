@@ -81,10 +81,10 @@ spec:
         stage("Copy Kubeconfig") {
             steps {
                 script {
-                sh """
+                sh '''
                     mkdir -p ~/.kube
                     cp ${KUBECONFIG} ~/.kube/config
-                """
+                '''
             }
             }
         }
