@@ -124,7 +124,7 @@ spec:
                     def baseBranch = "main"
 
                     // 克隆 Helm Chart Package 包存储库到 chart-repo 目录.
-                    sh "git clone ${gitPackageRepo} chart-repo"
+                    sh "git clone ${env.gitPackageRepo} chart-repo"
 
                     // 使用 if 语句，根据分支判断图表包应该推送到 stable 或是 staging 目录.
                     def repoType
