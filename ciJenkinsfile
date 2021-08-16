@@ -30,8 +30,8 @@ spec:
   serviceAccountName: jenkins
   hostAliases:
   - hostnames:
-    - inner-k8s.9f.cn
-    ip: 192.168.64.1
+    - inner-k8s.aiops.red
+    ip: 192.168.8.1
   containers:
     # 定义容器的名称
   - name: test-and-release-ci
@@ -156,7 +156,7 @@ spec:
                         
                         // 更新 git 配置信息，需要填写你自己的 github 邮箱及用户名.
                         sh """
-                            git config --global user.email 'weiwendi@live.cn'
+                            git config --global user.email 'weiwendi@aiops.red'
                             git config --global user.name 'weiwendi'
                         """
 
