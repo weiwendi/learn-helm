@@ -87,10 +87,10 @@ spec:
 
         stage("Copy Kubeconfig") {
             steps {
-                sh """
+                sh '''
                     mkdir -p ~/.kube
                     cp ${KUBECONFIG} ~/.kube/config
-                """
+                '''
             }
         }
         stage("List Changed Charts") {
