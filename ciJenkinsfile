@@ -148,15 +148,17 @@ spec:
                         sh "mkdir chart-repo/${repoType}"
                     }
 
-                    sh """
                         // 移动图表包到 stable 或 staging 目录.
-                        mv *.tgz chart-repo/${repoType}/
+                        sh "mv *.tgz chart-repo/${repoType}/"
+
                         // 更新索引文件.
-                        helm repo index chart-repo/${repoType}
+                        sh "helm repo index chart-repo/${repoType}"
+                        
                         // 更新 git 配置信息，需要填写你自己的 github 邮箱及用户名.
-                        git config --global user.email 'weiwendi@live.cn'
-                        git config --global user.name 'weiwendi'
-                    """
+                        sh """
+                            git config --global user.email 'weiwendi@live.cn'
+                            git config --global user.name 'weiwendi'
+                        """
 
                     dir("chart-repo") {
 		        // Add and commit the changes
