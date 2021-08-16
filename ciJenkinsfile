@@ -1,19 +1,18 @@
-// 声明 CI 管道.
+// 声明 CI Pipeline.
 pipeline {
 
-    // environment 设置变量,此处定义的变量作用域是整个管道.
+    // environment 用于设置变量,变量作用域是该管道.
     environment {
-        // 为 Helm Charts 源代码仓库及 Helm Charts Package 仓库设置变量.
-        // gitSourceRepo 仓库包含了 Helm Charts 的源代码，也有本书其他相关代码，如 Jenkinsfile.
-        // gitPackageRepo 是 Helm Package 存储库.
-        // 这两个仓库地址，你都需要修改成 Fork 后的地址.
-        gitSourceRepo = 'https://github.com/weiwendi/learn-helm.git'
-        gitPackageRepo = 'https://github.com/weiwendi/charts.git'
 
-        // 定义凭证变量，我们在 Jenkins 控制台创建了两个凭证，ID 分别为 github、kubeconfig.
-        // 在向 gitPackageRepo 推送 Charts 包时会用到 GITAUTH 变量.
-        // KUBECONFIG 会被挂在到 Pod 中，与 Kubernetes 集群进行交互.
+        // 为 Helm Charts 源代码仓库及 Helm Charts Package 仓库设置变量.
+        githubForkUrl = 'https://github.com/weiwendi/learn-helm.git'
+        githubPagesRepoUrl = 'https://github.com/weiwendi/charts.git'
+
+        // 定义凭证变量，gitabc 是我们在 Jenkins 控制台创建的凭证 ID;
+        // GITAUTH 变量在向 githubPagesRepoUrl 推送 Charts 包的时候会用到.
         GITAUTH = credentials('github')
+
+        // kubeconfig
         KUBECONFIG = credentials('kubeconfig')
     }
 
@@ -32,12 +31,10 @@ spec:
     - inner-k8s.9f.cn
     ip: 192.168.64.1
   containers:
-    # 定义容器的名称.
+    # 定义容器的名称
   - name: test-and-release-ci
-    # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl.
-    # 镜像 Dockerfile 可以在源码仓库的 docker 目录下查看.
+    # 指定容器的镜像,该镜像包含了 helm/ct/yamllint/yamale/git/kubectl
     image: registry.cn-beijing.aliyuncs.com/sretech/cttools:latest
-    imagePullPolicy: IfNotPresent
     command:
     - sleep
     args:
@@ -49,9 +46,9 @@ spec:
       limits:
         memory: "1024Mi"
         cpu: "1000m"
-  # Pod 被调度到包含 roles: cicd 标签的节点上运行.
+  # 选择标签是 public: yes 的节点运行该 Pod.
   nodeSelector:
-    roles: cicd
+    public: yes
 '''
             // 设置执行各 stages 时默认使用 test-and-release-ci 容器
             defaultContainer 'test-and-release-ci'
@@ -61,72 +58,76 @@ spec:
     // Jenkins 选项
     options {
 
-        // 显示执行时间，需要 Timestamper 插件支持.
+        // 显示执行的时间，需要 Timestamper 插件支持.
         timestamps()
 
         // 在 Stage View 中展示近  10 次构建信息
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
-    // 定义管道执行的各个阶段、每个阶段的具体步骤，建议包含至少一个 stage.
+    // 设置 pipeline 执行的各个阶段,建议至少包含一个 stage.
     stages {
 
         // stage 定义了 pipeline 完成的所有实际工作.
-        // 首先，我们定义一个打印构建信息的 stage.
-        stage("Print Build Messages") {
+        stage('Build Messages') {
 
-            // steps 定义了管道中具体执行的步骤.
+            // steps 定义了 pipeline 具体执行的步骤.
             steps {
                 
-                // container 选择哪个容器执行该 steps，不是用 container 选项的话，会使用默认容器执行 steps.
+                // 指定使用哪个容器执行该 steps,默认是 test-and-release-ci,这里用来演示 container 的用法.
                 container("test-and-release-ci") {
-                    echo " workspace: ${WORKSPACE}\n gitPackageRepo: ${gitPackageRepo}\n gitSourceRepo: ${gitSourceRepo}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
+                    echo " workspace: ${WORKSPACE}\n githubPagesRepoUrl: ${githubPagesRepoUrl}\n githubForkUrl: ${githubForkUrl}\n branch: ${env.BRANCH_NAME}\n buildId: ${BUILD_ID}"
                 }
             }
         }	
 
         stage("Copy Kubeconfig") {
             steps {
-                sh '''
-                    mkdir -p ~/.kube
-                    cp ${KUBECONFIG} ~/.kube/config
-                '''
+                script {
+                    sh """
+                        mkdir -p ~/.kube
+                        cp ${KUBECONFIG} ~/.kube/config
+                    """
+                }
             }
         }
         stage("List Changed Charts") {
             steps {
-                sh "ct list-changed"
+                script {
+                    sh "ct list-changed"
+                }
             }
         }
 
         stage("Lint") {
             steps {
-                sh "ct lint"
+                container("test-and-release-ci") {
+                    sh "ct lint"
+                }
             }
         }
 
         stage("Install & Test") {
             steps {
-                sh "ct install --upgrade"
+                script {
+                    sh "ct install --upgrade"
+                }
             }
         }
         stage("Package Charts") {
             steps {
-                sh """
-                    helm package --dependency-update helm-charts/charts/*
-                    ls -l
-                """
+                script {
+                    sh "helm package --dependency-update helm-charts/charts/*"
+                    sh "ls -l"
+                }
             }
         }
-        stage("Push Charts to gitPackageRepo") {
+        stage("Push Charts to Chart Repo") {
             steps {
                 script {
                     def baseBranch = "main"
+                    sh "git clone ${env.githubPagesRepoUrl} chart-repo"
 
-                    // 克隆 Helm Chart Package 包存储库到 chart-repo 目录.
-                    sh "git clone ${env.gitPackageRepo} chart-repo"
-
-                    // 使用 if 语句，根据分支判断图表包应该推送到 stable 或是 staging 目录.
                     def repoType
                     if (env.BRANCH_NAME == baseBranch) {
                         repoType = "stable"
@@ -134,36 +135,29 @@ spec:
                         repoType = "staging"
                     }
 
-                    // 如果不存在，创建 stable 或 staging 目录.
                     def files = sh(script: "ls chart-repo", returnStdout: true)
                     if (!files.contains(repoType)) {
                         sh "mkdir chart-repo/${repoType}"
                     }
 
                     sh """
-                        // 将图表包移动到 chart-repo 的 stable 或 staging 目录中.
                         mv *.tgz chart-repo/${repoType}/
 
-                        // 更新 index.html.
                         helm repo index chart-repo/${repoType}
 
-                        // 更新 git 配置信息，需要把邮箱、用户名改为你自己的.
                         git config --global user.email 'weiwendi@live.cn'
                         git config --global user.name 'weiwendi'
                     """
 
                     dir("chart-repo") {
-		        // Add and commit the changes.
-		        sh """
-		            git add --all
-			    git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'
-		        """
-
-                        // 推送图表包到 gitPackageRepo 仓库.
+		        // Add and commit the changes
+		        sh "git add --all"
+			sh "git commit -m 'pushing charts from branch ${env.BRANCH_NAME}'"
 			script {
+
 			    // Inject GitHub auth and push to the repo where charts are being served
-		            def authRepo = env.gitPackageRepo.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
-			    sh 'git push ${authRepo} ${baseBranch}'
+		            def authRepo = env.githubPagesRepoUrl.replace("://", "://${GITAUTH_USR}:${GITAUTH_PSW}@")
+			    sh "git push ${authRepo} ${baseBranch}"
 		        }
 
                     }
