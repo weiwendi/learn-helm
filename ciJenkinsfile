@@ -13,7 +13,7 @@ pipeline {
         // 定义凭证变量，我们在 Jenkins 控制台创建了两个凭证，ID 分别为 github、kubeconfig.
         // 在向 gitPackageRepo 推送 Charts 包时会用到 GITAUTH 变量.
         // KUBECONFIG 会被挂在到 Pod 中，与 Kubernetes 集群进行交互.
-        GITAUTH = credentials("github")
+        GITAUTH = credentials('github')
         KUBECONFIG = credentials("kubeconfig")
     }
 
