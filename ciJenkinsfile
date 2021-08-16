@@ -7,14 +7,14 @@ pipeline {
         // gitSourceRepo 仓库包含了 Helm Charts 的源代码，也有本书其他相关代码，如 Jenkinsfile.
         // gitPackageRepo 是 Helm Package 存储库.
         // 这两个仓库地址，你都需要修改成 Fork 后的地址.
-        gitSourceRepo = 'https://github.com/weiwendi/learn-helm.git'
-        gitPackageRepo = 'https://github.com/weiwendi/charts.git'
+        gitSourceRepo = "https://github.com/weiwendi/learn-helm.git"
+        gitPackageRepo = "https://github.com/weiwendi/charts.gitrr"
 
         // 定义凭证变量，我们在 Jenkins 控制台创建了两个凭证，ID 分别为 github、kubeconfig.
         // 在向 gitPackageRepo 推送 Charts 包时会用到 GITAUTH 变量.
         // KUBECONFIG 会被挂在到 Pod 中，与 Kubernetes 集群进行交互.
-        GITAUTH = credentials('github')
-        KUBECONFIG = credentials('kubeconfig')
+        GITAUTH = credentials("github")
+        KUBECONFIG = credentials("kubeconfig")
     }
 
 
@@ -124,7 +124,7 @@ spec:
                     def baseBranch = "main"
 
                     // 克隆 Helm Chart Package 包存储库到 chart-repo 目录.
-                    sh 'git clone ${env.gitPackageRepo} chart-repo'
+                    sh 'git clone ${gitPackageRepo} chart-repo'
 
                     // 使用 if 语句，根据分支判断图表包应该推送到 stable 或是 staging 目录.
                     def repoType
