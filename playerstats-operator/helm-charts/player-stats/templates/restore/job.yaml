@@ -1,0 +1,28 @@
+{{- if .Values.mongodb.persistence.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "player-stats.fullname" . }}-restore
+  labels:
+    {{- include "player-stats.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-rollback
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: restore
+          image: bitnami/mongodb:4.4.6-debian-10-r0
+          command: ["/bin/sh", "-c"]
+          args: ["cd /backup/ &&
+            mongorestore -h {{ .Values.mongodb.fullnameOverride }}:{{ .Values.mongodb.service.port }} || true"]
+          volumeMounts:
+            - name: backup
+              mountPath: /backup
+      restartPolicy: Never
+      volumes:
+        - name: backup
+          persistentVolumeClaim:
+            claimName: {{ .Values.mongodb.fullnameOverride }}-data-backup-{{ .Release.Revision }}
+{{- end }}

@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: v0.1.0
+dependencies:
+- name: mongodb
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.15.x
+description: Used to deploy the player-stats application.
+maintainers:
+- name: weiwendi
+name: player-stats
+type: application
+version: 1.0.0

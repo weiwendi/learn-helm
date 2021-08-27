@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "player-stats.fullname" . }}-test-mongodb-connection
+  labels:
+    {{- include "player-stats.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  containers:
+    - name: test-mongodb-connection
+      image: bitnami/mongodb:4.4.6-debian-10-r0
+      # image: registry.cn-beijing.aliyuncs.com/sretech/mongo:4.4.6
+      command: ["/bin/sh", "-c"]
+      args: ['mongo --host {{ .Values.mongodb.fullnameOverride }}:{{ .Values.mongodb.service.port }} --quiet --eval "db.infor.find()" stats']
+  restartPolicy: Never

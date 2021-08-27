@@ -1,0 +1,366 @@
+apiVersion: charts.quay.io/v1alpha1
+kind: Player-stats
+metadata:
+  name: player-stats-sample
+spec:
+  # Default values copied from <project_dir>/helm-charts/player-stats/values.yaml
+  affinity: {}
+  autoscaling:
+    enabled: false
+    maxReplicas: 100
+    minReplicas: 1
+    targetCPUUtilizationPercentage: 80
+  fullnameOverride: ""
+  image:
+    pullPolicy: IfNotPresent
+    repository: registry.cn-beijing.aliyuncs.com/sretech/player-stats
+    tag: ""
+  imagePullSecrets: []
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - host: chart-example.local
+      paths:
+      - backend:
+          serviceName: chart-example.local
+          servicePort: 80
+        path: /
+    tls: []
+  mongodb:
+    affinity: {}
+    annotations: {}
+    arbiter:
+      affinity: {}
+      annotations: {}
+      configuration: ""
+      containerSecurityContext:
+        enabled: true
+        runAsUser: 1001
+      customLivenessProbe: {}
+      customReadinessProbe: {}
+      enabled: true
+      extraEnvVars: []
+      extraFlags: []
+      extraVolumeMounts: []
+      extraVolumes: []
+      hostAliases: []
+      initContainers: {}
+      labels: {}
+      livenessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      nodeAffinityPreset:
+        key: ""
+        type: ""
+        values: []
+      nodeSelector: {}
+      pdb:
+        create: false
+        minAvailable: 1
+      podAffinityPreset: ""
+      podAnnotations: {}
+      podAntiAffinityPreset: soft
+      podLabels: {}
+      podSecurityContext:
+        enabled: true
+        fsGroup: 1001
+        sysctls: []
+      readinessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      resources:
+        limits: {}
+        requests: {}
+      service:
+        nameOverride: ""
+      sidecars: {}
+      tolerations: []
+    architecture: standalone
+    auth:
+      enabled: false
+      replicaSetKey: ""
+      rootPassword: ""
+    clusterDomain: cluster.local
+    common:
+      exampleValue: common-chart
+      global: {}
+    commonAnnotations: {}
+    configuration: ""
+    containerSecurityContext:
+      enabled: true
+      runAsNonRoot: true
+      runAsUser: 1001
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    directoryPerDB: false
+    disableJavascript: false
+    disableSystemLog: false
+    enableIPv6: false
+    enableJournal: true
+    externalAccess:
+      autoDiscovery:
+        enabled: false
+        image:
+          pullPolicy: IfNotPresent
+          pullSecrets: []
+          registry: docker.io
+          repository: bitnami/kubectl
+          tag: 1.18.18-debian-10-r18
+        resources:
+          limits: {}
+          requests: {}
+      enabled: false
+      hidden:
+        enabled: false
+        service:
+          annotations: {}
+          loadBalancerIPs: []
+          loadBalancerSourceRanges: []
+          nodePorts: []
+          port: 27017
+          type: LoadBalancer
+      service:
+        annotations: {}
+        loadBalancerIPs: []
+        loadBalancerSourceRanges: []
+        nodePorts: []
+        port: 27017
+        type: LoadBalancer
+    extraEnvVars: []
+    extraFlags: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    fullnameOverride: mongo
+    global: {}
+    hidden:
+      affinity: {}
+      annotations: {}
+      configuration: ""
+      customLivenessProbe: {}
+      customReadinessProbe: {}
+      enabled: false
+      extraEnvVars: []
+      extraFlags: []
+      extraVolumeMounts: []
+      extraVolumes: []
+      initContainers: {}
+      labels: {}
+      livenessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 30
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      nodeAffinityPreset:
+        key: ""
+        type: ""
+        values: []
+      nodeSelector: {}
+      pdb:
+        create: false
+        minAvailable: 1
+      persistence:
+        accessModes:
+        - ReadWriteOnce
+        annotations: {}
+        enabled: true
+        mountPath: /bitnami/mongodb
+        size: 8Gi
+        subPath: ""
+        volumeClaimTemplates: {}
+      podAffinityPreset: ""
+      podAnnotations: {}
+      podAntiAffinityPreset: soft
+      podLabels: {}
+      podManagementPolicy: OrderedReady
+      readinessProbe:
+        enabled: true
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 5
+      replicaCount: 1
+      resources:
+        limits: {}
+        requests: {}
+      sidecars: {}
+      strategyType: RollingUpdate
+      tolerations: []
+    hostAliases: []
+    image:
+      debug: false
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: bitnami/mongodb
+      tag: 4.4.6-debian-10-r0
+    initContainers: {}
+    initdbScripts: {}
+    labels: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    metrics:
+      containerPort: 9216
+      enabled: false
+      extraFlags: ""
+      extraUri: ""
+      image:
+        pullPolicy: IfNotPresent
+        registry: docker.io
+        repository: bitnami/mongodb-exporter
+        tag: 0.11.2-debian-10-r158
+      livenessProbe:
+        enabled: true
+        failureThreshold: 3
+        initialDelaySeconds: 15
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 5
+      prometheusRule:
+        additionalLabels: {}
+        enabled: false
+        rules: {}
+      readinessProbe:
+        enabled: true
+        failureThreshold: 3
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+      resources:
+        limits: {}
+        requests: {}
+      service:
+        annotations:
+          prometheus.io/path: /metrics
+          prometheus.io/port: '{{ .Values.metrics.service.port }}'
+          prometheus.io/scrape: "true"
+        port: 9216
+        type: ClusterIP
+      serviceMonitor:
+        additionalLabels: {}
+        enabled: false
+        interval: 30s
+    nodeAffinityPreset:
+      key: ""
+      type: ""
+      values: []
+    nodeSelector: {}
+    pdb:
+      create: false
+      minAvailable: 1
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      mountPath: /bitnami/mongodb
+      size: 8Gi
+      subPath: ""
+      volumeClaimTemplates: {}
+    podAffinityPreset: ""
+    podAnnotations: {}
+    podAntiAffinityPreset: soft
+    podLabels: {}
+    podManagementPolicy: OrderedReady
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+      sysctls: []
+    podSecurityPolicy:
+      allowPrivilegeEscalation: false
+      create: false
+      privileged: false
+      spec: {}
+    rbac:
+      create: false
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    replicaCount: 2
+    replicaSetHostnames: true
+    replicaSetName: rs0
+    resources:
+      limits: {}
+      requests: {}
+    service:
+      annotations: {}
+      externalIPs: []
+      loadBalancerSourceRanges: []
+      nameOverride: ""
+      nodePort: ""
+      port: 27017
+      portName: mongodb
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+    sidecars: {}
+    startupProbe:
+      enabled: false
+      failureThreshold: 30
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    strategyType: RollingUpdate
+    systemLogVerbosity: 0
+    tls:
+      enabled: false
+      image:
+        pullPolicy: IfNotPresent
+        registry: docker.io
+        repository: bitnami/nginx
+        tag: 1.19.10-debian-10-r20
+    tolerations: []
+    useStatefulSet: false
+    volumePermissions:
+      enabled: false
+      image:
+        pullPolicy: Always
+        pullSecrets: []
+        registry: docker.io
+        repository: bitnami/bitnami-shell
+        tag: "10"
+      resources:
+        limits: {}
+        requests: {}
+      securityContext:
+        runAsUser: 0
+  nameOverride: ""
+  nodeSelector: {}
+  podAnnotations: {}
+  podSecurityContext: {}
+  replicaCount: 1
+  resources: {}
+  securityContext: {}
+  service:
+    port: 80
+    type: NodePort
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: ""
+  tolerations: []
+  
+  
